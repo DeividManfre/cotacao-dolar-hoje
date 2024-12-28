@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Veja a cotação do dólar hoje em tempo real.">
+  <meta name="keywords" content="dólar hoje, cotação dólar, cotação em tempo real, dólar atual">
+  <meta name="author" content="Deivid Reis Teixeira">
+  <title>Dólar Hoje - Cotação em Tempo Real</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      text-align: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #333;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #ads {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Cotação do Dólar Hoje</h1>
+    <p id="cotacao">Carregando cotação...</p>
+    <p id="atualizado">Atualizado em: --</p>
+    <button id="btnAtualizar">Atualizar</button>
+    <div id="ads">
+      <!-- Código do Google AdSense será inserido aqui -->
+      <p>Seu anúncio aparecerá aqui.</p>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://economia.awesomeapi.com.br/json/last/USD-BRL";
+
+    // Função para formatar números no padrão brasileiro
+    function formatarValor(valor) {
+      return parseFloat(valor).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      });
+    }
+
+    // Função para formatar datas no padrão brasileiro
+    function formatarData(dataISO) {
+      const data = new Date(dataISO);
+      return data.toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+    }
+
+    async function atualizarCotacao() {
+      try {
+        const urlComTimestamp = `${API_URL}?timestamp=${new Date().getTime()}`;
+        const response = await fetch(urlComTimestamp);
+
+        if (!response.ok) {
+          throw new Error(`Erro na API: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const cotacao = data.USDBRL.bid;
+        const atualizado = data.USDBRL.create_date;
+
+        document.getElementById("cotacao").innerText = formatarValor(cotacao);
+        document.getElementById("atualizado").innerText = `Atualizado em: ${formatarData(atualizado)}`;
+      } catch (error) {
+        document.getElementById("cotacao").innerText = "Erro ao carregar cotação.";
+        console.error("Erro ao buscar a cotação:", error);
+      }
+    }
+
+    // Atualiza ao carregar a página
+    window.onload = atualizarCotacao;
+
+    // Atualiza ao clicar no botão
+    document.getElementById("btnAtualizar").addEventListener("click", atualizarCotacao);
+  </script>
+</body>
+</html>
